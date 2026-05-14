@@ -2,7 +2,6 @@ import os
 from datetime import timedelta
 
 class Config:
-    # Flask
     SECRET_KEY = 'portscan-secret-key-2026'
     SESSION_COOKIE_HTTPONLY = True
     PERMANENT_SESSION_LIFETIME = timedelta(hours=8)
@@ -11,7 +10,6 @@ class Config:
     SQLALCHEMY_DATABASE_URI = 'sqlite:///portscan.db'
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     
-    # Logging
     LOG_DIR = os.path.join(os.path.dirname(__file__), 'logs')
     if not os.path.exists(LOG_DIR):
         os.makedirs(LOG_DIR)
