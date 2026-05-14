@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+
+{% block title %}Registrar - portScan{% endblock %}
+
+{% block content %}
+<div class="auth-container">
+    <div class="register-box">
+        <h1>📝 Novo Registro</h1>
+        <p class="subtitle">Crie sua conta no portScan</p>
+        
+        <form method="POST" class="register-form">
+            <div class="form-group">
+                <label for="username">Usuário:</label>
+                <input type="text" id="username" name="username" required minlength="3">
+                <small>Mínimo 3 caracteres</small>
+            </div>
+            
+            <div class="form-group">
+                <label for="email">Email:</label>
+                <input type="email" id="email" name="email" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="password">Senha:</label>
+                <input type="password" id="password" name="password" required minlength="6">
+                <small>Mínimo 6 caracteres</small>
+            </div>
+            
+            <div class="form-group">
+                <label for="confirm_password">Confirmar Senha:</label>
+                <input type="password" id="confirm_password" name="confirm_password" required>
+            </div>
+            
+            <button type="submit" class="btn btn-primary btn-block">Registrar</button>
+        </form>
+        
+        <p class="login-link">
+            Já tem uma conta? <a href="{{ url_for('auth.login') }}">Faça login aqui</a>
+        </p>
+    </div>
+</div>
+{% endblock %}

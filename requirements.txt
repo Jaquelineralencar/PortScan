@@ -1,0 +1,13 @@
+# Instructions to build/install the PortScan project:
+#
+# 1. Install dependencies:
+#    pip install -r requirements.txt
+#
+# 2. Run the application:
+#    python app.py
+#
+# Note: Ensure Python 3.7+ is installed.
+
+Flask==2.3.3
+flask-login==0.6.2
+Werkzeug==2.3.7

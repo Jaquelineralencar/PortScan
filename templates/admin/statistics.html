@@ -1,0 +1,351 @@
+{% extends "base.html" %}
+
+{% block title %}Estatísticas - portScan{% endblock %}
+
+{% block content %}
+<div class="stats-container">
+    <div class="stats-header">
+        <h1>📊 Estatísticas do Sistema</h1>
+    </div>
+
+    <div class="stats-nav">
+        <a href="{{ url_for('admin.manage_users') }}" class="stats-nav-link">👥 Gerenciar Usuários</a>
+        {% if current_user.role == 'admin' %}
+            <a href="{{ url_for('admin.audit_logs') }}" class="stats-nav-link">📋 Logs</a>
+        {% endif %}
+        <a href="{{ url_for('scanner.dashboard') }}" class="stats-nav-link">← Voltar</a>
+    </div>
+
+    <!-- KPIs Principais -->
+    <div class="kpi-grid">
+        <div class="kpi-card kpi-users">
+            <div class="kpi-icon">👥</div>
+            <div class="kpi-content">
+                <h3>Usuários Total</h3>
+                <p class="kpi-value">{{ stats.total_users }}</p>
+            </div>
+        </div>
+
+        <div class="kpi-card kpi-scans">
+            <div class="kpi-icon">🔍</div>
+            <div class="kpi-content">
+                <h3>Scans Realizados</h3>
+                <p class="kpi-value">{{ stats.total_scans }}</p>
+            </div>
+        </div>
+
+        <div class="kpi-card kpi-success">
+            <div class="kpi-icon">✓</div>
+            <div class="kpi-content">
+                <h3>Scans Completados</h3>
+                <p class="kpi-value">{{ stats.completed_scans }}</p>
+            </div>
+        </div>
+
+        <div class="kpi-card kpi-rate">
+            <div class="kpi-icon">📈</div>
+            <div class="kpi-content">
+                <h3>Taxa de Sucesso</h3>
+                <p class="kpi-value">{{ stats.success_rate }}%</p>
+            </div>
+        </div>
+
+        <div class="kpi-card kpi-failed">
+            <div class="kpi-icon">✗</div>
+            <div class="kpi-content">
+                <h3>Scans Falhados</h3>
+                <p class="kpi-value">{{ stats.failed_scans }}</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Usuários por Role -->
+    <div class="stats-section">
+        <h2>👥 Distribuição de Usuários por Role</h2>
+        <div class="role-distribution">
+            {% for role_name, count in stats.users_by_role.items()|sort %}
+                <div class="role-stat">
+                    <div class="role-stat-header">
+                        <span class="role-badge role-{{ role_name }}">{{ role_name|upper }}</span>
+                        <span class="count-badge">{{ count }}</span>
+                    </div>
+                    <div class="progress-bar">
+                    <div class="progress-fill" data-width="{{ percentage }}"></div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- Top Scans por Usuário -->
+    {% if stats.scans_by_user %}
+        <div class="stats-section">
+            <h2>🏆 Top Usuários por Scans</h2>
+            <table class="stats-table">
+                <thead>
+                    <tr>
+                        <th>Posição</th>
+                        <th>Usuário</th>
+                        <th>Scans Realizados</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for username, total in stats.scans_by_user %}
+                        <tr>
+                            <td>
+                                {% if loop.index == 1 %}
+                                    <span class="medal">🥇</span>
+                                {% elif loop.index == 2 %}
+                                    <span class="medal">🥈</span>
+                                {% elif loop.index == 3 %}
+                                    <span class="medal">🥉</span>
+                                {% else %}
+                                    #{{ loop.index }}
+                                {% endif %}
+                            </td>
+                            <td><strong>{{ username }}</strong></td>
+                            <td>
+                                <span class="scan-count">{{ total }}</span>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% endif %}
+
+    <!-- Resumo -->
+    <div class="stats-summary">
+        <h2>📋 Resumo</h2>
+        <div class="summary-grid">
+            <div class="summary-item">
+                <h3>Sistema</h3>
+                <p>O portScan cadastrou <strong>{{ stats.total_users }}</strong> usuário(s) em <strong>{{ stats.users_by_role|length }}</strong> role(s)</p>
+            </div>
+            <div class="summary-item">
+                <h3>Atividade</h3>
+                <p>Foram realizados <strong>{{ stats.total_scans }}</strong> scan(s), com <strong>{{ stats.success_rate }}%</strong> de taxa de sucesso</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.stats-container {
+    background: white;
+    padding: 2rem;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
+
+.stats-header {
+    margin-bottom: 2rem;
+    border-bottom: 2px solid #667eea;
+    padding-bottom: 1rem;
+}
+
+.stats-header h1 {
+    color: #333;
+}
+
+.stats-nav {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 2rem;
+    flex-wrap: wrap;
+}
+
+.stats-nav-link {
+    background: #667eea;
+    color: white;
+    padding: 0.5rem 1rem;
+    border-radius: 4px;
+    text-decoration: none;
+    font-weight: bold;
+    transition: all 0.3s;
+}
+
+.stats-nav-link:hover {
+    background: #764ba2;
+}
+
+.kpi-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 3rem;
+}
+
+.kpi-card {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 1.5rem;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+}
+
+.kpi-icon {
+    font-size: 2rem;
+    opacity: 0.8;
+}
+
+.kpi-content h3 {
+    font-size: 0.9rem;
+    opacity: 0.9;
+    margin-bottom: 0.5rem;
+}
+
+.kpi-value {
+    font-size: 2rem;
+    font-weight: bold;
+}
+
+.kpi-users {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.kpi-scans {
+    background: linear-gradient(135deg, #45b7d1 0%, #00bcd4 100%);
+}
+
+.kpi-success {
+    background: linear-gradient(135deg, #2ecc71 0%, #27ae60 100%);
+}
+
+.kpi-rate {
+    background: linear-gradient(135deg, #f39c12 0%, #e67e22 100%);
+}
+
+.kpi-failed {
+    background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+}
+
+.stats-section {
+    background: #f9f9f9;
+    padding: 2rem;
+    border-radius: 8px;
+    margin-bottom: 2rem;
+}
+
+.stats-section h2 {
+    color: #333;
+    margin-bottom: 1.5rem;
+}
+
+.role-distribution {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.role-stat {
+    background: white;
+    padding: 1rem;
+    border-radius: 4px;
+}
+
+.role-stat-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.5rem;
+}
+
+.count-badge {
+    background: #667eea;
+    color: white;
+    padding: 0.25rem 0.75rem;
+    border-radius: 20px;
+    font-weight: bold;
+    font-size: 0.9rem;
+}
+
+.progress-bar {
+    width: 100%;
+    height: 20px;
+    background: #e0e0e0;
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+    transition: width 0.3s;
+}
+
+.stats-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: white;
+}
+
+.stats-table thead {
+    background: #f0f0f0;
+}
+
+.stats-table th {
+    padding: 1rem;
+    text-align: left;
+    font-weight: bold;
+    border-bottom: 2px solid #ddd;
+}
+
+.stats-table td {
+    padding: 1rem;
+    border-bottom: 1px solid #eee;
+}
+
+.medal {
+    font-size: 1.5rem;
+}
+
+.scan-count {
+    background: #e7f3ff;
+    color: #0066cc;
+    padding: 0.5rem 1rem;
+    border-radius: 4px;
+    font-weight: bold;
+}
+
+.stats-summary {
+    background: #e7f3ff;
+    padding: 2rem;
+    border-radius: 8px;
+    border-left: 4px solid #0066cc;
+}
+
+.stats-summary h2 {
+    color: #0066cc;
+    margin-bottom: 1rem;
+}
+
+.summary-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1.5rem;
+}
+
+.summary-item {
+    background: white;
+    padding: 1.5rem;
+    border-radius: 4px;
+}
+
+.summary-item h3 {
+    color: #333;
+    margin-bottom: 0.5rem;
+}
+
+.summary-item p {
+    color: #666;
+    line-height: 1.6;
+}
+.progress-fill {
+    width: attr(data-width percentage);
+}
+</style>
+{% endblock %}

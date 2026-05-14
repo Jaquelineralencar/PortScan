@@ -1,0 +1,99 @@
+{% extends "base.html" %}
+
+{% block title %}Detalhes do Scan - portScan{% endblock %}
+
+{% block content %}
+<div class="scan-details">
+    <div class="scan-header">
+        <h1>Detalhes do Scan</h1>
+        <span class="status-badge status-{{ scan.status }}">{{ scan.status|upper }}</span>
+    </div>
+    
+    <div class="scan-info-grid">
+        <div class="info-card">
+            <h3>Alvo</h3>
+            <p><code>{{ scan.target_ip }}</code></p>
+        </div>
+        <div class="info-card">
+            <h3>Hostname</h3>
+            <p>{{ scan.target_hostname or 'Não resolvido' }}</p>
+        </div>
+        <div class="info-card">
+            <h3>Executado por</h3>
+            <p>{{ scan.executor.username }} ({{ scan.executor.role }})</p>
+        </div>
+        <div class="info-card">
+            <h3>Data</h3>
+            <p>{{ scan.created_at.strftime('%d/%m/%Y %H:%M:%S') }}</p>
+        </div>
+        <div class="info-card">
+            <h3>Tipo de Scan</h3>
+            <p>{{ scan.scan_type }}</p>
+        </div>
+        <div class="info-card">
+            <h3>Status</h3>
+            <p>{{ scan.status }}</p>
+        </div>
+    </div>
+    
+    {% if scan.status == 'completed' and results %}
+        <div class="scan-results">
+            <h2>📊 Resultados</h2>
+            
+            {% if results.open_ports %}
+                <div class="results-section open-ports">
+                    <h3>🟢 Portas Abertas ({{ results.open_ports|length }})</h3>
+                    <div class="ports-list">
+                        {% for port in results.open_ports %}
+                            <div class="port-item open">
+                                <span class="port-number">{{ port.port }}</span>
+                                <span class="service-name">{{ port.service or 'Desconhecido' }}</span>
+                                <span class="port-status">ABERTA</span>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            {% endif %}
+            
+            {% if results.filtered_ports and results.filtered_ports|length > 0 %}
+                <div class="results-section filtered-ports">
+                    <h3>🟡 Portas Filtradas ({{ results.filtered_ports|length }})</h3>
+                    <p class="section-note">Essas portas podem estar bloqueadas por firewall.</p>
+                    <div class="ports-list summary">
+                        <p>{{ results.filtered_ports|length }} porta(s) filtrada(s)</p>
+                    </div>
+                </div>
+            {% endif %}
+            
+            {% if results.closed_ports %}
+                <div class="results-section closed-ports">
+                    <h3>🔴 Portas Fechadas ({{ results.closed_ports|length }})</h3>
+                    <p class="section-note">Essas portas estão fechadas e não responsivas.</p>
+                    <div class="ports-list summary">
+                        <p>{{ results.closed_ports|length }} porta(s) fechada(s)</p>
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+    {% elif scan.status == 'failed' %}
+        <div class="error-section">
+            <h2>❌ Erro no Scan</h2>
+            <p class="error-message">{{ scan.error_message }}</p>
+        </div>
+    {% elif scan.status == 'pending' or scan.status == 'running' %}
+        <div class="pending-section">
+            <h2>⏳ Scan em Andamento</h2>
+            <p>Por favor, aguarde enquanto o scan é executado...</p>
+        </div>
+    {% endif %}
+    
+    <div class="scan-actions">
+        <a href="{{ url_for('scanner.dashboard') }}" class="btn btn-secondary">← Voltar</a>
+        {% if scan.status == 'completed' %}
+            <form method="POST" action="{{ url_for('scanner.delete_scan', scan_id=scan.id) }}" style="display:inline;">
+                <button type="submit" class="btn btn-danger" onclick="return confirm('Tem certeza que deseja deletar este scan?')">🗑️ Deletar Scan</button>
+            </form>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

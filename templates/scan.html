@@ -1,0 +1,81 @@
+{% extends "base.html" %}
+
+{% block title %}Novo Scan - portScan{% endblock %}
+
+{% block content %}
+<div class="scan-container">
+    <h1>🔍 Novo Scan de Portas</h1>
+    
+    <div class="scan-info">
+        <h2>Sua Função: <span class="role-badge role-{{ current_user.role }}">{{ role_info.description }}</span></h2>
+        <p>Nível: {{ role_info.level }}/4</p>
+    </div>
+    
+    <form method="POST" class="scan-form">
+        <div class="form-section">
+            <h3>📍 Alvo</h3>
+            
+            <div class="form-group">
+                <label for="target_ip">Endereço IP do Alvo:</label>
+                <input type="text" id="target_ip" name="target_ip" placeholder="Ex: 192.168.1.1" required>
+                <small>Formato: XXX.XXX.XXX.XXX</small>
+            </div>
+        </div>
+        
+        <div class="form-section">
+            <h3>⚙️ Configurações</h3>
+            
+            <div class="form-group">
+                <label for="ports">Portas para Escanear:</label>
+                <select id="ports" name="ports">
+                    <option value="common">Portas Comuns (20, 21, 22, 25, 53, 80, 110, 143, 443, 445, 3306, 3389, 5432, 5900, 8080, 8443)</option>
+                    <option value="1-1024">Range Bem Conhecido (1-1024)</option>
+                    <option value="1-65535">Todas as Portas (1-65535) - Mais Lento</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label for="scan_type">Tipo de Scan:</label>
+                <select id="scan_type" name="scan_type">
+                    <option value="basic">Básico - Menor Impacto</option>
+                    {% if 'criar_escaneamentos_agressivos' in permissions %}
+                        <option value="aggressive">Agressivo - Mais Detalhado (Sua permissão)</option>
+                    {% endif %}
+                </select>
+                <small>Seu papel permite tipos: 
+                    {% if 'criar_escaneamentos_agressivos' in permissions %}
+                        Básico e Agressivo
+                    {% else %}
+                        Apenas Básico
+                    {% endif %}
+                </small>
+            </div>
+        </div>
+        
+        <div class="form-section">
+            <h3>🔒 Restrições</h3>
+            <div class="restrictions">
+                {% if 'escanear_rede_externa' in permissions %}
+                    <p>✓ Você pode fazer scans em IPs INTERNOS e EXTERNOS</p>
+                {% else %}
+                    <p>✓ Você pode fazer scans apenas em IPs INTERNOS</p>
+                    <p class="warning">⚠️ Scans em IPs externos são restritos ao seu nível!</p>
+                {% endif %}
+                
+                {% if 'escanear_infraestrutura_critica' in permissions %}
+                    <p>✓ Você pode fazer scans em infraestrutura CRÍTICA</p>
+                {% else %}
+                    <p class="warning">⚠️ Você NÃO pode fazer scans em infraestrutura crítica!</p>
+                {% endif %}
+            </div>
+        </div>
+        
+        <button type="submit" class="btn btn-primary btn-large">▶️ Iniciar Scan</button>
+    </form>
+    
+    <div class="scan-help">
+        <h3>💡 Dica:</h3>
+        <p>Se você receber um erro de permissão, solicite ao seu gestor de segurança para aumentar seu nível de acesso.</p>
+    </div>
+</div>
+{% endblock %}

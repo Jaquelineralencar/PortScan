@@ -1,0 +1,281 @@
+{% extends "base.html" %}
+
+{% block title %}Logs de Auditoria - portScan{% endblock %}
+
+{% block content %}
+<div class="audit-container">
+    <div class="audit-header">
+        <h1>📋 Logs de Auditoria</h1>
+        <p class="subtitle">Histórico completo de ações do sistema</p>
+    </div>
+
+    <div class="audit-nav">
+        <a href="{{ url_for('admin.manage_users') }}" class="audit-nav-link">👥 Gerenciar Usuários</a>
+        <a href="{{ url_for('admin.statistics') }}" class="audit-nav-link">📊 Estatísticas</a>
+        <a href="{{ url_for('scanner.dashboard') }}" class="audit-nav-link">← Voltar</a>
+    </div>
+
+    <div class="logs-section">
+        <h2>Log Entries</h2>
+        <div class="logs-viewer">
+            <table class="logs-table">
+                <thead>
+                    <tr>
+                        <th>Timestamp</th>
+                        <th>Level</th>
+                        <th>Evento</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for log in logs %}
+                        {% set log_parts = log.split(' - ', 2) %}
+                        {% if log_parts|length >= 3 %}
+                            {% set timestamp = log_parts[0] %}
+                            {% set level = log_parts[1] %}
+                            {% set message = log_parts[2] if log_parts|length > 2 else '' %}
+                        {% else %}
+                            {% set timestamp = 'N/A' %}
+                            {% set level = 'INFO' %}
+                            {% set message = log %}
+                        {% endif %}
+                        
+                        <tr class="log-row level-{{ level|lower }}">
+                            <td class="log-time">{{ timestamp }}</td>
+                            <td class="log-level">
+                                <span class="level-badge level-{{ level|lower }}">{{ level }}</span>
+                            </td>
+                            <td class="log-message">
+                                {% if 'AUDIT' in message %}
+                                    <span class="audit-highlight">{{ message }}</span>
+                                {% elif 'ERROR' in level %}
+                                    <span class="error-highlight">{{ message }}</span>
+                                {% else %}
+                                    {{ message }}
+                                {% endif %}
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="logs-legend">
+        <h3>Legenda</h3>
+        <div class="legend-grid">
+            <div class="legend-item">
+                <span class="level-badge level-audit">[AUDIT]</span>
+                <p>Ação de usuário (login, scan, etc)</p>
+            </div>
+            <div class="legend-item">
+                <span class="level-badge level-info">[INFO]</span>
+                <p>Informação operacional</p>
+            </div>
+            <div class="legend-item">
+                <span class="level-badge level-warning">[WARNING]</span>
+                <p>Aviso importante</p>
+            </div>
+            <div class="legend-item">
+                <span class="level-badge level-error">[ERROR]</span>
+                <p>Erro no sistema</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.audit-container {
+    background: white;
+    padding: 2rem;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
+
+.audit-header {
+    margin-bottom: 2rem;
+    border-bottom: 2px solid #667eea;
+    padding-bottom: 1rem;
+}
+
+.audit-header h1 {
+    color: #333;
+    margin-bottom: 0.5rem;
+}
+
+.subtitle {
+    color: #666;
+    font-size: 0.9rem;
+}
+
+.audit-nav {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 2rem;
+    flex-wrap: wrap;
+}
+
+.audit-nav-link {
+    background: #667eea;
+    color: white;
+    padding: 0.5rem 1rem;
+    border-radius: 4px;
+    text-decoration: none;
+    font-weight: bold;
+    transition: all 0.3s;
+}
+
+.audit-nav-link:hover {
+    background: #764ba2;
+}
+
+.logs-section {
+    margin-bottom: 2rem;
+}
+
+.logs-section h2 {
+    color: #333;
+    margin-bottom: 1rem;
+}
+
+.logs-viewer {
+    background: #1e1e1e;
+    border-radius: 8px;
+    overflow: hidden;
+    max-height: 600px;
+    overflow-y: auto;
+}
+
+.logs-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-family: 'Courier New', monospace;
+    font-size: 0.9rem;
+    color: #d4d4d4;
+}
+
+.logs-table th {
+    background: #2d2d2d;
+    padding: 1rem;
+    text-align: left;
+    font-weight: bold;
+    border-bottom: 1px solid #444;
+    color: #9cdcfe;
+    position: sticky;
+    top: 0;
+}
+
+.logs-table td {
+    padding: 0.75rem 1rem;
+    border-bottom: 1px solid #333;
+    word-break: break-word;
+}
+
+.log-row {
+    transition: background 0.2s;
+}
+
+.log-row:hover {
+    background: #252525;
+}
+
+.log-time {
+    color: #9cdcfe;
+    width: 200px;
+    flex-shrink: 0;
+}
+
+.log-level {
+    width: 80px;
+    flex-shrink: 0;
+}
+
+.level-badge {
+    display: inline-block;
+    padding: 0.25rem 0.5rem;
+    border-radius: 3px;
+    font-size: 0.85rem;
+    font-weight: bold;
+}
+
+.level-info {
+    background: #4ec9b0;
+    color: white;
+}
+
+.level-audit {
+    background: #45b7d1;
+    color: white;
+}
+
+.level-warning {
+    background: #f39c12;
+    color: white;
+}
+
+.level-error {
+    background: #e74c3c;
+    color: white;
+}
+
+.log-message {
+    color: #ce9178;
+    flex: 1;
+}
+
+.audit-highlight {
+    color: #4ec9b0;
+    font-weight: bold;
+}
+
+.error-highlight {
+    color: #f48771;
+    font-weight: bold;
+}
+
+.logs-legend {
+    background: #f9f9f9;
+    padding: 2rem;
+    border-radius: 8px;
+}
+
+.logs-legend h3 {
+    color: #333;
+    margin-bottom: 1rem;
+}
+
+.legend-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1.5rem;
+}
+
+.legend-item {
+    display: flex;
+    gap: 1rem;
+    align-items: start;
+}
+
+.legend-item p {
+    color: #666;
+    font-size: 0.9rem;
+}
+
+/* Scrollbar customizado */
+.logs-viewer::-webkit-scrollbar {
+    width: 8px;
+}
+
+.logs-viewer::-webkit-scrollbar-track {
+    background: #2d2d2d;
+}
+
+.logs-viewer::-webkit-scrollbar-thumb {
+    background: #555;
+    border-radius: 4px;
+}
+
+.logs-viewer::-webkit-scrollbar-thumb:hover {
+    background: #777;
+}
+</style>
+{% endblock %}

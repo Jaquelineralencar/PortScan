@@ -1,0 +1,97 @@
+2026-05-14 18:40:48,353 - INFO - [STARTUP] portScan iniciando...
+2026-05-14 18:40:48,368 - WARNING -  * Debugger is active!
+2026-05-14 18:40:48,375 - INFO -  * Debugger PIN: 858-986-706
+2026-05-14 18:41:19,330 - INFO -  * Detected change in 'C:\\Users\\jaque\\OneDrive\\Documentos\\SegInfo\\scan\\portScan\\app.py', reloading
+2026-05-14 18:41:19,600 - INFO - [STARTUP] portScan iniciando...
+2026-05-14 18:41:19,609 - WARNING -  * Debugger is active!
+2026-05-14 18:41:19,616 - INFO -  * Debugger PIN: 858-986-706
+2026-05-14 18:41:21,736 - INFO -  * Detected change in 'C:\\Users\\jaque\\OneDrive\\Documentos\\SegInfo\\scan\\portScan\\app.py', reloading
+2026-05-14 18:41:21,996 - INFO - [STARTUP] portScan iniciando...
+2026-05-14 18:41:22,012 - WARNING -  * Debugger is active!
+2026-05-14 18:41:22,023 - INFO -  * Debugger PIN: 858-986-706
+2026-05-14 18:41:23,114 - INFO -  * Detected change in 'C:\\Users\\jaque\\OneDrive\\Documentos\\SegInfo\\scan\\portScan\\app.py', reloading
+2026-05-14 18:41:23,376 - INFO - [STARTUP] portScan iniciando...
+2026-05-14 18:41:23,383 - WARNING -  * Debugger is active!
+2026-05-14 18:41:23,390 - INFO -  * Debugger PIN: 858-986-706
+2026-05-14 18:41:26,561 - INFO -  * Detected change in 'C:\\Users\\jaque\\OneDrive\\Documentos\\SegInfo\\scan\\portScan\\app.py', reloading
+2026-05-14 18:41:26,819 - INFO - [STARTUP] portScan iniciando...
+2026-05-14 18:41:26,835 - WARNING -  * Debugger is active!
+2026-05-14 18:41:26,846 - INFO -  * Debugger PIN: 858-986-706
+2026-05-14 18:41:27,939 - INFO -  * Detected change in 'C:\\Users\\jaque\\OneDrive\\Documentos\\SegInfo\\scan\\portScan\\app.py', reloading
+2026-05-14 18:41:28,203 - INFO - [STARTUP] portScan iniciando...
+2026-05-14 18:41:28,210 - WARNING -  * Debugger is active!
+2026-05-14 18:41:28,221 - INFO -  * Debugger PIN: 858-986-706
+2026-05-14 18:41:29,314 - INFO -  * Detected change in 'C:\\Users\\jaque\\OneDrive\\Documentos\\SegInfo\\scan\\portScan\\app.py', reloading
+2026-05-14 18:41:29,581 - INFO - [STARTUP] portScan iniciando...
+2026-05-14 18:41:29,585 - WARNING -  * Debugger is active!
+2026-05-14 18:41:29,594 - INFO -  * Debugger PIN: 858-986-706
+2026-05-14 18:41:34,794 - INFO -  * Detected change in 'C:\\Users\\jaque\\OneDrive\\Documentos\\SegInfo\\scan\\portScan\\app.py', reloading
+2026-05-14 18:41:35,048 - INFO - [STARTUP] portScan iniciando...
+2026-05-14 18:41:35,048 - WARNING -  * Debugger is active!
+2026-05-14 18:41:35,069 - INFO -  * Debugger PIN: 858-986-706
+2026-05-14 18:42:09,100 - INFO -  * Detected change in 'C:\\Users\\jaque\\OneDrive\\Documentos\\SegInfo\\scan\\portScan\\scanner\\port_scanner.py', reloading
+2026-05-14 18:42:09,370 - INFO - [STARTUP] portScan iniciando...
+2026-05-14 18:42:09,376 - WARNING -  * Debugger is active!
+2026-05-14 18:42:09,388 - INFO -  * Debugger PIN: 858-986-706
+2026-05-14 18:42:11,510 - INFO -  * Detected change in 'C:\\Users\\jaque\\OneDrive\\Documentos\\SegInfo\\scan\\portScan\\scanner\\port_scanner.py', reloading
+2026-05-14 18:42:11,782 - INFO - [STARTUP] portScan iniciando...
+2026-05-14 18:42:11,790 - WARNING -  * Debugger is active!
+2026-05-14 18:42:11,795 - INFO -  * Debugger PIN: 858-986-706
+2026-05-14 18:42:18,043 - INFO -  * Detected change in 'C:\\Users\\jaque\\OneDrive\\Documentos\\SegInfo\\scan\\portScan\\scanner\\port_scanner.py', reloading
+2026-05-14 18:42:18,328 - INFO - [STARTUP] portScan iniciando...
+2026-05-14 18:42:18,335 - WARNING -  * Debugger is active!
+2026-05-14 18:42:18,342 - INFO -  * Debugger PIN: 858-986-706
+2026-05-14 18:42:19,425 - INFO -  * Detected change in 'C:\\Users\\jaque\\OneDrive\\Documentos\\SegInfo\\scan\\portScan\\scanner\\port_scanner.py', reloading
+2026-05-14 18:42:19,710 - INFO - [STARTUP] portScan iniciando...
+2026-05-14 18:42:19,710 - WARNING -  * Debugger is active!
+2026-05-14 18:42:19,728 - INFO -  * Debugger PIN: 858-986-706
+2026-05-14 18:42:20,820 - INFO -  * Detected change in 'C:\\Users\\jaque\\OneDrive\\Documentos\\SegInfo\\scan\\portScan\\scanner\\port_scanner.py', reloading
+2026-05-14 18:42:21,095 - INFO - [STARTUP] portScan iniciando...
+2026-05-14 18:42:21,102 - WARNING -  * Debugger is active!
+2026-05-14 18:42:21,109 - INFO -  * Debugger PIN: 858-986-706
+2026-05-14 18:42:23,228 - INFO -  * Detected change in 'C:\\Users\\jaque\\OneDrive\\Documentos\\SegInfo\\scan\\portScan\\scanner\\port_scanner.py', reloading
+2026-05-14 18:42:23,494 - INFO - [STARTUP] portScan iniciando...
+2026-05-14 18:42:23,494 - WARNING -  * Debugger is active!
+2026-05-14 18:42:23,508 - INFO -  * Debugger PIN: 858-986-706
+2026-05-14 18:42:26,650 - INFO -  * Detected change in 'C:\\Users\\jaque\\OneDrive\\Documentos\\SegInfo\\scan\\portScan\\scanner\\port_scanner.py', reloading
+2026-05-14 18:42:26,927 - INFO - [STARTUP] portScan iniciando...
+2026-05-14 18:42:26,935 - WARNING -  * Debugger is active!
+2026-05-14 18:42:26,941 - INFO -  * Debugger PIN: 858-986-706
+2026-05-14 18:42:29,054 - INFO -  * Detected change in 'C:\\Users\\jaque\\OneDrive\\Documentos\\SegInfo\\scan\\portScan\\scanner\\port_scanner.py', reloading
+2026-05-14 18:42:29,320 - INFO - [STARTUP] portScan iniciando...
+2026-05-14 18:42:29,335 - WARNING -  * Debugger is active!
+2026-05-14 18:42:29,344 - INFO -  * Debugger PIN: 858-986-706
+2026-05-14 18:42:38,670 - INFO -  * Detected change in 'C:\\Users\\jaque\\OneDrive\\Documentos\\SegInfo\\scan\\portScan\\routes\\scanner_routes.py', reloading
+2026-05-14 18:42:38,938 - INFO - [STARTUP] portScan iniciando...
+2026-05-14 18:42:38,938 - WARNING -  * Debugger is active!
+2026-05-14 18:42:38,955 - INFO -  * Debugger PIN: 858-986-706
+2026-05-14 18:42:41,079 - INFO -  * Detected change in 'C:\\Users\\jaque\\OneDrive\\Documentos\\SegInfo\\scan\\portScan\\routes\\scanner_routes.py', reloading
+2026-05-14 18:42:41,344 - INFO - [STARTUP] portScan iniciando...
+2026-05-14 18:42:41,348 - WARNING -  * Debugger is active!
+2026-05-14 18:42:41,358 - INFO -  * Debugger PIN: 858-986-706
+2026-05-14 18:42:45,535 - INFO -  * Detected change in 'C:\\Users\\jaque\\OneDrive\\Documentos\\SegInfo\\scan\\portScan\\routes\\scanner_routes.py', reloading
+2026-05-14 18:42:45,800 - INFO - [STARTUP] portScan iniciando...
+2026-05-14 18:42:45,816 - WARNING -  * Debugger is active!
+2026-05-14 18:42:45,824 - INFO -  * Debugger PIN: 858-986-706
+2026-05-14 18:43:06,516 - INFO -  * Detected change in 'C:\\Users\\jaque\\OneDrive\\Documentos\\SegInfo\\scan\\portScan\\auth\\decorators.py', reloading
+2026-05-14 18:43:06,783 - INFO - [STARTUP] portScan iniciando...
+2026-05-14 18:43:06,785 - WARNING -  * Debugger is active!
+2026-05-14 18:43:06,798 - INFO -  * Debugger PIN: 858-986-706
+2026-05-14 18:43:09,939 - INFO -  * Detected change in 'C:\\Users\\jaque\\OneDrive\\Documentos\\SegInfo\\scan\\portScan\\auth\\decorators.py', reloading
+2026-05-14 18:43:10,208 - INFO - [STARTUP] portScan iniciando...
+2026-05-14 18:43:10,222 - WARNING -  * Debugger is active!
+2026-05-14 18:43:10,228 - INFO -  * Debugger PIN: 858-986-706
+2026-05-14 18:43:14,409 - INFO -  * Detected change in 'C:\\Users\\jaque\\OneDrive\\Documentos\\SegInfo\\scan\\portScan\\auth\\decorators.py', reloading
+2026-05-14 18:43:36,187 - INFO - [STARTUP] portScan iniciando...
+2026-05-14 18:43:36,187 - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:5000
+2026-05-14 18:43:36,187 - INFO - [33mPress CTRL+C to quit[0m
+2026-05-14 18:43:36,204 - INFO -  * Restarting with stat
+2026-05-14 18:43:36,435 - INFO - [STARTUP] portScan iniciando...
+2026-05-14 18:43:36,455 - WARNING -  * Debugger is active!
+2026-05-14 18:43:36,461 - INFO -  * Debugger PIN: 858-986-706
+2026-05-14 18:43:36,722 - INFO - 127.0.0.1 - - [14/May/2026 18:43:36] "[32mGET /scan/dashboard HTTP/1.1[0m" 302 -
+2026-05-14 18:43:36,742 - INFO - 127.0.0.1 - - [14/May/2026 18:43:36] "GET /auth/login?next=/scan/dashboard HTTP/1.1" 200 -
+2026-05-14 18:44:04,215 - INFO - 127.0.0.1 - - [14/May/2026 18:44:04] "GET /auth/login?next=/scan/dashboard HTTP/1.1" 200 -
+2026-05-14 18:44:04,291 - INFO - 127.0.0.1 - - [14/May/2026 18:44:04] "[36mGET /static/style.css HTTP/1.1[0m" 304 -
+2026-05-14 18:44:17,076 - INFO - 127.0.0.1 - - [14/May/2026 18:44:17] "GET /auth/login?next=/scan/dashboard HTTP/1.1" 200 -

@@ -1,0 +1,101 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard - portScan{% endblock %}
+
+{% block content %}
+<div class="dashboard">
+    <h1>📊 Dashboard</h1>
+    
+    <div class="user-role-info">
+        <h2>Informações do Usuário</h2>
+        <div class="info-grid">
+            <div class="info-card">
+                <h3>Usuário</h3>
+                <p>{{ current_user.username }}</p>
+            </div>
+            <div class="info-card">
+                <h3>Função</h3>
+                <p><span class="role-badge role-{{ current_user.role }}">{{ role_info.description }}</span></p>
+            </div>
+            <div class="info-card">
+                <h3>Email</h3>
+                <p>{{ current_user.email }}</p>
+            </div>
+        </div>
+    </div>
+    
+    <div class="permissions-info">
+        <h2>Suas Permissões</h2>
+        <div class="permissions-list">
+            {% for permission in permissions %}
+                <span class="permission-badge">✓ {{ permission }}</span>
+            {% endfor %}
+        </div>
+    </div>
+    
+    <div class="scans-section">
+        <h2>📝 Histórico de Scans</h2>
+        
+        {% if scans.items %}
+            <div class="scans-table">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Alvo</th>
+                            <th>Hostname</th>
+                            <th>Tipo</th>
+                            <th>Status</th>
+                            <th>Data</th>
+                            <th>Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for scan in scans.items %}
+                            <tr class="scan-row status-{{ scan.status }}">
+                                <td><code>{{ scan.target_ip }}</code></td>
+                                <td>{{ scan.target_hostname or '-' }}</td>
+                                <td>{{ scan.scan_type }}</td>
+                                <td><span class="status-badge status-{{ scan.status }}">{{ scan.status }}</span></td>
+                                <td>{{ scan.created_at.strftime('%d/%m/%Y %H:%M') }}</td>
+                                <td>
+                                    <a href="{{ url_for('scanner.view_scan', scan_id=scan.id) }}" class="action-link">Detalhes</a>
+                                    {% if scan.status == 'completed' %}
+                                        <form method="POST" action="{{ url_for('scanner.delete_scan', scan_id=scan.id) }}" style="display:inline;">
+                                            <button type="submit" class="action-link delete" onclick="return confirm('Tem certeza?')">Deletar</button>
+                                        </form>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            
+            <!-- Paginação -->
+            {% if scans.pages > 1 %}
+                <div class="pagination">
+                    {% if scans.has_prev %}
+                        <a href="{{ url_for('scanner.dashboard', page=scans.prev_num) }}" class="page-link">« Anterior</a>
+                    {% endif %}
+                    
+                    {% for page_num in scans.iter_pages() %}
+                        {% if page_num %}
+                            {% if page_num == scans.page %}
+                                <span class="page-link active">{{ page_num }}</span>
+                            {% else %}
+                                <a href="{{ url_for('scanner.dashboard', page=page_num) }}" class="page-link">{{ page_num }}</a>
+                            {% endif %}
+                        {% endif %}
+                    {% endfor %}
+                    
+                    {% if scans.has_next %}
+                        <a href="{{ url_for('scanner.dashboard', page=scans.next_num) }}" class="page-link">Próxima »</a>
+                    {% endif %}
+                </div>
+            {% endif %}
+        {% else %}
+            <p class="no-data">Nenhum scan realizado ainda. <a href="{{ url_for('scanner.new_scan') }}">Comece um novo scan</a></p>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
