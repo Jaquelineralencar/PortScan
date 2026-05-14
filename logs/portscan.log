@@ -95,3 +95,12 @@
 2026-05-14 18:44:04,215 - INFO - 127.0.0.1 - - [14/May/2026 18:44:04] "GET /auth/login?next=/scan/dashboard HTTP/1.1" 200 -
 2026-05-14 18:44:04,291 - INFO - 127.0.0.1 - - [14/May/2026 18:44:04] "[36mGET /static/style.css HTTP/1.1[0m" 304 -
 2026-05-14 18:44:17,076 - INFO - 127.0.0.1 - - [14/May/2026 18:44:17] "GET /auth/login?next=/scan/dashboard HTTP/1.1" 200 -
+2026-05-14 18:44:40,209 - INFO - 127.0.0.1 - - [14/May/2026 18:44:40] "GET /auth/login?next=/scan/dashboard HTTP/1.1" 200 -
+2026-05-14 18:44:40,218 - INFO - 127.0.0.1 - - [14/May/2026 18:44:40] "[36mGET /static/style.css HTTP/1.1[0m" 304 -
+2026-05-14 18:45:55,678 - INFO - [AUDIT] Usuário admin (role: administrador) fez login
+2026-05-14 18:45:55,678 - INFO - 127.0.0.1 - - [14/May/2026 18:45:55] "[32mPOST /auth/login?next=/scan/dashboard HTTP/1.1[0m" 302 -
+2026-05-14 18:45:55,678 - INFO - 127.0.0.1 - - [14/May/2026 18:45:55] "[32mGET /dashboard HTTP/1.1[0m" 302 -
+2026-05-14 18:45:55,678 - INFO - 127.0.0.1 - - [14/May/2026 18:45:55] "GET /scan/dashboard HTTP/1.1" 200 -
+2026-05-14 18:45:55,704 - INFO - 127.0.0.1 - - [14/May/2026 18:45:55] "[36mGET /static/style.css HTTP/1.1[0m" 304 -
+2026-05-14 18:46:14,726 - INFO - 127.0.0.1 - - [14/May/2026 18:46:14] "GET /scan/new HTTP/1.1" 200 -
+2026-05-14 18:46:14,736 - INFO - 127.0.0.1 - - [14/May/2026 18:46:14] "[36mGET /static/style.css HTTP/1.1[0m" 304 -
