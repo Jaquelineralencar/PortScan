@@ -11,7 +11,7 @@
 
     <div class="admin-nav">
         <a href="{{ url_for('admin.statistics') }}" class="admin-nav-link">📊 Estatísticas</a>
-        {% if current_user.role == 'admin' %}
+        {% if current_user.role == 'administrador' %}
             <a href="{{ url_for('admin.audit_logs') }}" class="admin-nav-link">📋 Logs de Auditoria</a>
         {% endif %}
         <a href="{{ url_for('scanner.dashboard') }}" class="admin-nav-link">← Voltar</a>
@@ -50,16 +50,16 @@
                                     <span class="status-inactive">✗ Inativo</span>
                                 {% endif %}
                             </td>
-                            <td>{{ user.created_at.strftime('%d/%m/%Y') }}</td>
+                            <td>{{ user.created_at[:10] }}</td>
                             <td class="actions-cell">
                                 <!-- Promover -->
                                 <div class="action-dropdown">
-                                    <form method="POST" class="role-form">
+                                    <form method="POST" action="{{ url_for('admin.promote_user', user_id=user.id) }}" class="role-form">
                                         <select name="new_role" class="role-select" onchange="this.form.submit()">
                                             <option value="">🔼 Promover</option>
                                             {% for role_name, role_info in role_hierarchy.items() %}
                                                 {% if role_info.level > role_hierarchy[user.role].level %}
-                                                    {% if current_user.role == 'admin' or role_info.level < current_role_level %}
+                                                    {% if current_user.role == 'administrador' or role_info.level < current_role_level %}
                                                         <option value="{{ role_name }}">→ {{ role_name }} (Lv{{ role_info.level }})</option>
                                                     {% endif %}
                                                 {% endif %}
@@ -75,7 +75,7 @@
                                             <option value="">🔽 Rebaixar</option>
                                             {% for role_name, role_info in role_hierarchy.items() %}
                                                 {% if role_info.level < role_hierarchy[user.role].level %}
-                                                    {% if current_user.role == 'admin' or role_info.level < current_role_level %}
+                                                    {% if current_user.role == 'administrador' or role_info.level < current_role_level %}
                                                         <option value="{{ role_name }}">← {{ role_name }} (Lv{{ role_info.level }})</option>
                                                     {% endif %}
                                                 {% endif %}

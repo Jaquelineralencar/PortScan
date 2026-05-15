@@ -45,6 +45,23 @@ def create_tables():
         )
     ''')
 
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS access_logs (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            admin_user_id INTEGER NOT NULL,
+            target_user_id INTEGER NOT NULL,
+            action_type TEXT NOT NULL,
+            old_role TEXT,
+            new_role TEXT,
+            old_status INTEGER,
+            new_status INTEGER,
+            description TEXT,
+            created_at TEXT DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY (admin_user_id) REFERENCES users (id),
+            FOREIGN KEY (target_user_id) REFERENCES users (id)
+        )
+    ''')
+
     conn.commit()
     conn.close()
 
@@ -142,6 +159,11 @@ class ScanLog:
         self.created_at = created_at
         self.completed_at = completed_at
         self.duration_seconds = duration_seconds
+
+    @property
+    def executor(self):
+        return get_user_by_id(self.user_id)
+        
 
 def add_scan_log(user_id, target_ip, target_hostname=None, ports=None, scan_type='basic'):
     conn = get_connection()
@@ -243,3 +265,108 @@ def count_stats():
         'completed_scans': completed_scans,
         'failed_scans': failed_scans,
     }
+
+# ============================================================================
+# LOGS DE ACESSO - Registro de alterações de permissões e roles
+# ============================================================================
+
+class AccessLog:
+    def __init__(self, id, admin_user_id, target_user_id, action_type, old_role, new_role, old_status, new_status, description, created_at):
+        self.id = id
+        self.admin_user_id = admin_user_id
+        self.target_user_id = target_user_id
+        self.action_type = action_type  # 'role_change', 'status_change', 'created', 'deleted'
+        self.old_role = old_role
+        self.new_role = new_role
+        self.old_status = bool(old_status) if old_status is not None else None
+        self.new_status = bool(new_status) if new_status is not None else None
+        self.description = description
+        self.created_at = created_at
+
+def add_access_log(admin_user_id, target_user_id, action_type, old_role=None, new_role=None, 
+                   old_status=None, new_status=None, description=None):
+    """
+    Registra uma alteração de acesso/permissão no banco de dados
+    
+    Args:
+        admin_user_id: ID do usuário que realizou a ação
+        target_user_id: ID do usuário afetado
+        action_type: Tipo de ação ('role_change', 'status_change')
+        old_role: Role anterior
+        new_role: Role novo
+        old_status: Status anterior (is_active)
+        new_status: Status novo (is_active)
+        description: Descrição adicional da ação
+    """
+    conn = get_connection()
+    cursor = conn.cursor()
+    
+    cursor.execute('''
+        INSERT INTO access_logs (admin_user_id, target_user_id, action_type, old_role, new_role, old_status, new_status, description)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+    ''', (admin_user_id, target_user_id, action_type, old_role, new_role, 
+          int(old_status) if old_status is not None else None,
+          int(new_status) if new_status is not None else None,
+          description))
+    
+    conn.commit()
+    conn.close()
+
+def get_access_logs(page=1, per_page=50):
+    """Retorna logs de acesso paginados, ordenados por data decrescente"""
+    conn = get_connection()
+    cursor = conn.cursor()
+    offset = (page - 1) * per_page
+    
+    cursor.execute('''
+        SELECT * FROM access_logs 
+        ORDER BY created_at DESC 
+        LIMIT ? OFFSET ?
+    ''', (per_page, offset))
+    rows = cursor.fetchall()
+    
+    cursor.execute('SELECT COUNT(*) FROM access_logs')
+    total = cursor.fetchone()[0]
+    conn.close()
+    
+    return [AccessLog(*row) for row in rows], total
+
+def get_access_logs_for_user(target_user_id, page=1, per_page=50):
+    """Retorna logs de acesso de um usuário específico"""
+    conn = get_connection()
+    cursor = conn.cursor()
+    offset = (page - 1) * per_page
+    
+    cursor.execute('''
+        SELECT * FROM access_logs 
+        WHERE target_user_id = ?
+        ORDER BY created_at DESC 
+        LIMIT ? OFFSET ?
+    ''', (target_user_id, per_page, offset))
+    rows = cursor.fetchall()
+    
+    cursor.execute('SELECT COUNT(*) FROM access_logs WHERE target_user_id = ?', (target_user_id,))
+    total = cursor.fetchone()[0]
+    conn.close()
+    
+    return [AccessLog(*row) for row in rows], total
+
+def get_access_logs_by_admin(admin_user_id, page=1, per_page=50):
+    """Retorna logs de acesso realizados por um administrador específico"""
+    conn = get_connection()
+    cursor = conn.cursor()
+    offset = (page - 1) * per_page
+    
+    cursor.execute('''
+        SELECT * FROM access_logs 
+        WHERE admin_user_id = ?
+        ORDER BY created_at DESC 
+        LIMIT ? OFFSET ?
+    ''', (admin_user_id, per_page, offset))
+    rows = cursor.fetchall()
+    
+    cursor.execute('SELECT COUNT(*) FROM access_logs WHERE admin_user_id = ?', (admin_user_id,))
+    total = cursor.fetchone()[0]
+    conn.close()
+    
+    return [AccessLog(*row) for row in rows], total

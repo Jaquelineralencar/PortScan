@@ -24,7 +24,7 @@
         </div>
         <div class="info-card">
             <h3>Data</h3>
-            <p>{{ scan.created_at.strftime('%d/%m/%Y %H:%M:%S') }}</p>
+            <p>{{ scan.created_at[:10] }}</p>
         </div>
         <div class="info-card">
             <h3>Tipo de Scan</h3>

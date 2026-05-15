@@ -70,6 +70,56 @@ body {
     align-items: center;
 }
 
+/* ==================== DROPDOWN MENU ==================== */
+.nav-dropdown {
+    position: relative;
+    display: inline-block;
+}
+
+.nav-dropdown .nav-link {
+    cursor: pointer;
+    border: none;
+    background: rgba(255, 193, 7, 0.3);
+    font-weight: bold;
+}
+
+.dropdown-content {
+    display: none;
+    position: absolute;
+    background-color: #fff;
+    min-width: 250px;
+    box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+    z-index: 1000;
+    border-radius: 6px;
+    top: 100%;
+    right: 0;
+    margin-top: 0.5rem;
+    padding: 0.5rem 0;
+}
+
+.nav-dropdown:hover .dropdown-content {
+    display: block;
+}
+
+.dropdown-item {
+    color: #333;
+    padding: 0.75rem 1.5rem;
+    text-decoration: none;
+    display: block;
+    transition: all 0.2s;
+}
+
+.dropdown-item:hover {
+    background-color: #f1f1f1;
+    color: #667eea;
+}
+
+.dropdown-divider {
+    margin: 0.5rem 0;
+    border: none;
+    border-top: 1px solid #eee;
+}
+
 /* ==================== ROLE BADGES ==================== */
 .role-badge {
     display: inline-block;

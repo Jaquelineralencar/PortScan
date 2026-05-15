@@ -3,7 +3,8 @@ Rotas de Administração - Gerenciamento de Usuários
 """
 from flask import Blueprint, render_template, request, redirect, url_for, flash
 from flask_login import login_required, current_user
-from database import get_all_users, update_user_role, update_user_status, count_stats, get_all_scans
+from database import (get_all_users, update_user_role, update_user_status, count_stats, get_all_scans,
+                      add_access_log, get_access_logs, get_user_by_id)
 from auth.rbac import Role
 from auth.decorators import role_required
 import logging
@@ -46,6 +47,14 @@ def promote_user(user_id):
     if user.role == 'administrador' and current_user.role != 'administrador':
         flash('Apenas administradores podem modificar a função de outro administrador.', 'error')
         logging.warning(f'[AUDIT] ACESSO NEGADO: {current_user.username} tentou promover admin {user.username}')
+        add_access_log(
+            admin_user_id=current_user.id,
+            target_user_id=user.id,
+            action_type='role_change_denied',
+            old_role=user.role,
+            new_role=new_role,
+            description=f'Tentativa não autorizada de promoção negada'
+        )
         return redirect(url_for('admin.manage_users'))
     
     # Gestor pode promover até seu próprio nível
@@ -56,10 +65,28 @@ def promote_user(user_id):
     if current_user.role != 'administrador' and new_role_level >= current_user_level:
         flash('Você não pode promover para um role igual ou superior ao seu.', 'error')
         logging.warning(f'[AUDIT] Tentativa não autorizada: {current_user.username} tentou promover {user.username} para {new_role}')
+        add_access_log(
+            admin_user_id=current_user.id,
+            target_user_id=user.id,
+            action_type='role_change_denied',
+            old_role=user.role,
+            new_role=new_role,
+            description=f'Tentativa de promoção para role não autorizado'
+        )
         return redirect(url_for('admin.manage_users'))
     
     old_role = user.role
     update_user_role(user.id, new_role)
+    
+    # Registra a mudança no banco de dados
+    add_access_log(
+        admin_user_id=current_user.id,
+        target_user_id=user.id,
+        action_type='role_change',
+        old_role=old_role,
+        new_role=new_role,
+        description=f'Usuário promovido de {old_role} para {new_role}'
+    )
     
     logging.info(f'[AUDIT] {current_user.username} promoveu {user.username} de {old_role} para {new_role}')
     flash(f'Usuário {user.username} promovido de {old_role} para {new_role}.', 'success')
@@ -89,6 +116,14 @@ def demote_user(user_id):
     if user.role == 'administrador' and current_user.role != 'administrador':
         flash('Apenas administradores podem modificar a função de outro administrador.', 'error')
         logging.warning(f'[AUDIT] ACESSO NEGADO: {current_user.username} tentou rebaixar admin {user.username}')
+        add_access_log(
+            admin_user_id=current_user.id,
+            target_user_id=user.id,
+            action_type='role_change_denied',
+            old_role=user.role,
+            new_role=new_role,
+            description=f'Tentativa não autorizada de rebaixamento negada'
+        )
         return redirect(url_for('admin.manage_users'))
     
     # Gestor pode rebaixar até seu próprio nível
@@ -99,10 +134,28 @@ def demote_user(user_id):
     if current_user.role != 'administrador' and new_role_level >= current_user_level:
         flash('Você não pode rebaixar para um role igual ou superior ao seu.', 'error')
         logging.warning(f'[AUDIT] Tentativa não autorizada: {current_user.username} tentou rebaixar {user.username} para {new_role}')
+        add_access_log(
+            admin_user_id=current_user.id,
+            target_user_id=user.id,
+            action_type='role_change_denied',
+            old_role=user.role,
+            new_role=new_role,
+            description=f'Tentativa de rebaixamento para role não autorizado'
+        )
         return redirect(url_for('admin.manage_users'))
     
     old_role = user.role
     update_user_role(user.id, new_role)
+    
+    # Registra a mudança no banco de dados
+    add_access_log(
+        admin_user_id=current_user.id,
+        target_user_id=user.id,
+        action_type='role_change',
+        old_role=old_role,
+        new_role=new_role,
+        description=f'Usuário rebaixado de {old_role} para {new_role}'
+    )
     
     logging.info(f'[AUDIT] {current_user.username} rebaixou {user.username} de {old_role} para {new_role}')
     flash(f'Usuário {user.username} rebaixado de {old_role} para {new_role}.', 'success')
@@ -130,10 +183,28 @@ def toggle_user_status(user_id):
     if user.role == 'administrador' and current_user.role != 'administrador':
         flash('Apenas administradores podem modificar status de outro administrador.', 'error')
         logging.warning(f'[AUDIT] ACESSO NEGADO: {current_user.username} tentou modificar status do admin {user.username}')
+        add_access_log(
+            admin_user_id=current_user.id,
+            target_user_id=user.id,
+            action_type='status_change_denied',
+            old_status=user.is_active,
+            description=f'Tentativa não autorizada de mudança de status negada'
+        )
         return redirect(url_for('admin.manage_users'))
     
     new_status = not user.is_active
+    old_status = user.is_active
     update_user_status(user.id, new_status)
+    
+    # Registra a mudança de status no banco de dados
+    add_access_log(
+        admin_user_id=current_user.id,
+        target_user_id=user.id,
+        action_type='status_change',
+        old_status=old_status,
+        new_status=new_status,
+        description=f'Usuário {"ativado" if new_status else "desativado"}'
+    )
     
     status_text = 'ativado' if new_status else 'desativado'
     logging.info(f'[AUDIT] {current_user.username} {status_text} o usuário {user.username}')
@@ -146,15 +217,19 @@ def toggle_user_status(user_id):
 @role_required('administrador')  # Apenas administrador
 def audit_logs():
     """Visualiza logs de auditoria"""
-    try:
-        with open('logs/portscan.log', 'r', encoding='utf-8') as f:
-            logs = f.readlines()
-            logs = logs[-200:]  # Últimas 200 linhas
-            logs.reverse()  # Ordem inversa (mais recentes primeiro)
-    except FileNotFoundError:
-        logs = ['[INFO] Arquivo de logs não encontrado ainda.']
+    page = request.args.get('page', 1, type=int)
+    access_logs, total = get_access_logs(page=page, per_page=50)
     
-    return render_template('admin/audit_logs.html', logs=logs)
+    # Enriquece os logs com nomes de usuários
+    for log in access_logs:
+        log.admin_user = get_user_by_id(log.admin_user_id)
+        log.target_user = get_user_by_id(log.target_user_id)
+    
+    return render_template('admin/audit_logs.html', 
+                         access_logs=access_logs,
+                         page=page,
+                         total=total,
+                         per_page=50)
 
 @admin_bp.route('/statistics')
 @login_required

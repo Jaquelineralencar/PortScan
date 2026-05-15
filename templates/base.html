@@ -18,8 +18,15 @@
                 </span>
                 <a href="{{ url_for('scanner.dashboard') }}" class="nav-link">Dashboard</a>
                 <a href="{{ url_for('scanner.new_scan') }}" class="nav-link">Novo Scan</a>
-                {% if current_user.role in ['admin', 'gestor'] %}
-                    <a href="{{ url_for('admin.manage_users') }}" class="nav-link admin-link">⚙️ Admin</a>
+                {% if current_user.role in ['administrador', 'gestor'] %}
+                    <div class="nav-dropdown">
+                        <button class="nav-link admin-link">⚙️ Gestão ▼</button>
+                        <div class="dropdown-content">
+                            <a href="{{ url_for('admin.manage_users') }}" class="dropdown-item">👥 Gerenciar Usuários</a>
+                            <a href="{{ url_for('admin.audit_logs') }}" class="dropdown-item">📋 Logs de Auditoria</a>
+                            <a href="{{ url_for('admin.statistics') }}" class="dropdown-item">📊 Estatísticas</a>
+                        </div>
+                    </div>
                 {% endif %}
                 <a href="{{ url_for('auth.logout') }}" class="nav-link logout">Logout</a>
             {% else %}

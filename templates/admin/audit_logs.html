@@ -6,7 +6,7 @@
 <div class="audit-container">
     <div class="audit-header">
         <h1>📋 Logs de Auditoria</h1>
-        <p class="subtitle">Histórico completo de ações do sistema</p>
+        <p class="subtitle">Histórico completo de liberações de acesso e alterações no sistema</p>
     </div>
 
     <div class="audit-nav">
@@ -16,68 +16,147 @@
     </div>
 
     <div class="logs-section">
-        <h2>Log Entries</h2>
-        <div class="logs-viewer">
-            <table class="logs-table">
-                <thead>
-                    <tr>
-                        <th>Timestamp</th>
-                        <th>Level</th>
-                        <th>Evento</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for log in logs %}
-                        {% set log_parts = log.split(' - ', 2) %}
-                        {% if log_parts|length >= 3 %}
-                            {% set timestamp = log_parts[0] %}
-                            {% set level = log_parts[1] %}
-                            {% set message = log_parts[2] if log_parts|length > 2 else '' %}
-                        {% else %}
-                            {% set timestamp = 'N/A' %}
-                            {% set level = 'INFO' %}
-                            {% set message = log %}
-                        {% endif %}
-                        
-                        <tr class="log-row level-{{ level|lower }}">
-                            <td class="log-time">{{ timestamp }}</td>
-                            <td class="log-level">
-                                <span class="level-badge level-{{ level|lower }}">{{ level }}</span>
-                            </td>
-                            <td class="log-message">
-                                {% if 'AUDIT' in message %}
-                                    <span class="audit-highlight">{{ message }}</span>
-                                {% elif 'ERROR' in level %}
-                                    <span class="error-highlight">{{ message }}</span>
-                                {% else %}
-                                    {{ message }}
-                                {% endif %}
-                            </td>
+        <h2>📝 Histórico de Liberações de Acesso</h2>
+        
+        {% if access_logs %}
+            <div class="logs-viewer">
+                <table class="logs-table">
+                    <thead>
+                        <tr>
+                            <th>Data/Hora</th>
+                            <th>Ação</th>
+                            <th>Administrador</th>
+                            <th>Usuário Afetado</th>
+                            <th>Detalhes</th>
                         </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
+                    </thead>
+                    <tbody>
+                        {% for log in access_logs %}
+                            {% set action_icon = '🔄' %}
+                            {% set action_color = 'action-change' %}
+                            
+                            {% if log.action_type == 'role_change' %}
+                                {% set action_icon = '⬆️' %}
+                                {% set action_color = 'action-promote' %}
+                                {% set action_label = 'Mudança de Role' %}
+                            {% elif log.action_type == 'status_change' %}
+                                {% if log.new_status %}
+                                    {% set action_icon = '✅' %}
+                                    {% set action_color = 'action-activate' %}
+                                    {% set action_label = 'Usuário Ativado' %}
+                                {% else %}
+                                    {% set action_icon = '❌' %}
+                                    {% set action_color = 'action-deactivate' %}
+                                    {% set action_label = 'Usuário Desativado' %}
+                                {% endif %}
+                            {% elif 'denied' in log.action_type %}
+                                {% set action_icon = '🚫' %}
+                                {% set action_color = 'action-denied' %}
+                                {% set action_label = 'Ação Negada' %}
+                            {% endif %}
+                            
+                            <tr class="log-row {{ action_color }}">
+                                <td class="log-time">
+                                    {{ log.created_at | replace('T', ' ') }}
+                                </td>
+                                <td class="log-action">
+                                    <span class="action-icon">{{ action_icon }}</span>
+                                    <span class="action-label">{{ action_label }}</span>
+                                </td>
+                                <td class="log-admin">
+                                    {% if log.admin_user %}
+                                        <strong>{{ log.admin_user.username }}</strong>
+                                        <br>
+                                        <small>({{ log.admin_user.role }})</small>
+                                    {% else %}
+                                        <em>Sistema</em>
+                                    {% endif %}
+                                </td>
+                                <td class="log-target">
+                                    {% if log.target_user %}
+                                        <strong>{{ log.target_user.username }}</strong>
+                                        <br>
+                                        <small>{{ log.target_user.email }}</small>
+                                    {% else %}
+                                        <em>Usuário removido</em>
+                                    {% endif %}
+                                </td>
+                                <td class="log-details">
+                                    {% if log.action_type == 'role_change' or log.action_type == 'role_change_denied' %}
+                                        <div class="detail-item">
+                                            <strong>Role:</strong>
+                                            <span class="role-old">{{ log.old_role }}</span>
+                                            <span class="arrow">→</span>
+                                            <span class="role-new">{{ log.new_role }}</span>
+                                        </div>
+                                    {% elif log.action_type == 'status_change' or log.action_type == 'status_change_denied' %}
+                                        <div class="detail-item">
+                                            <strong>Status:</strong>
+                                            {% if log.old_status %}
+                                                <span class="status-active">Ativo</span>
+                                            {% else %}
+                                                <span class="status-inactive">Inativo</span>
+                                            {% endif %}
+                                            <span class="arrow">→</span>
+                                            {% if log.new_status %}
+                                                <span class="status-active">Ativo</span>
+                                            {% else %}
+                                                <span class="status-inactive">Inativo</span>
+                                            {% endif %}
+                                        </div>
+                                    {% endif %}
+                                    <div class="description">{{ log.description }}</div>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Paginação -->
+            {% if total > 50 %}
+                <div class="pagination">
+                    {% if page > 1 %}
+                        <a href="{{ url_for('admin.audit_logs', page=1) }}" class="page-link">« Primeira</a>
+                        <a href="{{ url_for('admin.audit_logs', page=page-1) }}" class="page-link">‹ Anterior</a>
+                    {% endif %}
+                    
+                    <span class="page-info">
+                        Página {{ page }} de {{ (total // 50) + (1 if total % 50 else 0) }} 
+                        ({{ total }} registros totais)
+                    </span>
+                    
+                    {% if page < ((total // 50) + (1 if total % 50 else 0)) %}
+                        <a href="{{ url_for('admin.audit_logs', page=page+1) }}" class="page-link">Próxima ›</a>
+                        <a href="{{ url_for('admin.audit_logs', page=(total // 50) + (1 if total % 50 else 0)) }}" class="page-link">Última »</a>
+                    {% endif %}
+                </div>
+            {% endif %}
+        {% else %}
+            <div class="no-logs">
+                <p>📭 Nenhum log de auditoria registrado ainda.</p>
+            </div>
+        {% endif %}
     </div>
 
     <div class="logs-legend">
-        <h3>Legenda</h3>
+        <h3>📖 Legenda de Ações</h3>
         <div class="legend-grid">
-            <div class="legend-item">
-                <span class="level-badge level-audit">[AUDIT]</span>
-                <p>Ação de usuário (login, scan, etc)</p>
+            <div class="legend-item action-promote">
+                <span class="legend-icon">⬆️</span>
+                <p><strong>Mudança de Role:</strong> Alteração nas permissões e acesso do usuário</p>
             </div>
-            <div class="legend-item">
-                <span class="level-badge level-info">[INFO]</span>
-                <p>Informação operacional</p>
+            <div class="legend-item action-activate">
+                <span class="legend-icon">✅</span>
+                <p><strong>Usuário Ativado:</strong> Usuário reativado no sistema</p>
             </div>
-            <div class="legend-item">
-                <span class="level-badge level-warning">[WARNING]</span>
-                <p>Aviso importante</p>
+            <div class="legend-item action-deactivate">
+                <span class="legend-icon">❌</span>
+                <p><strong>Usuário Desativado:</strong> Usuário desativado no sistema</p>
             </div>
-            <div class="legend-item">
-                <span class="level-badge level-error">[ERROR]</span>
-                <p>Erro no sistema</p>
+            <div class="legend-item action-denied">
+                <span class="legend-icon">🚫</span>
+                <p><strong>Ação Negada:</strong> Tentativa de ação não autorizada</p>
             </div>
         </div>
     </div>
@@ -89,6 +168,8 @@
     padding: 2rem;
     border-radius: 8px;
     box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    max-width: 1400px;
+    margin: 0 auto;
 }
 
 .audit-header {
@@ -98,13 +179,15 @@
 }
 
 .audit-header h1 {
+    margin: 0 0 0.5rem 0;
     color: #333;
-    margin-bottom: 0.5rem;
+    font-size: 2rem;
 }
 
 .subtitle {
+    margin: 0;
     color: #666;
-    font-size: 0.9rem;
+    font-size: 0.95rem;
 }
 
 .audit-nav {
@@ -115,17 +198,23 @@
 }
 
 .audit-nav-link {
-    background: #667eea;
-    color: white;
-    padding: 0.5rem 1rem;
-    border-radius: 4px;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1.25rem;
+    background-color: #f0f2f5;
+    color: #333;
     text-decoration: none;
-    font-weight: bold;
-    transition: all 0.3s;
+    border-radius: 6px;
+    border: 1px solid #ddd;
+    font-size: 0.95rem;
+    transition: all 0.3s ease;
 }
 
 .audit-nav-link:hover {
-    background: #764ba2;
+    background-color: #e8ebf0;
+    border-color: #667eea;
+    color: #667eea;
 }
 
 .logs-section {
@@ -134,148 +223,302 @@
 
 .logs-section h2 {
     color: #333;
+    font-size: 1.3rem;
     margin-bottom: 1rem;
+    border-left: 4px solid #667eea;
+    padding-left: 1rem;
 }
 
 .logs-viewer {
-    background: #1e1e1e;
-    border-radius: 8px;
-    overflow: hidden;
-    max-height: 600px;
-    overflow-y: auto;
+    overflow-x: auto;
+    border: 1px solid #ddd;
+    border-radius: 6px;
 }
 
 .logs-table {
     width: 100%;
     border-collapse: collapse;
-    font-family: 'Courier New', monospace;
     font-size: 0.9rem;
-    color: #d4d4d4;
+}
+
+.logs-table thead {
+    background-color: #f8f9fa;
+    border-bottom: 2px solid #ddd;
 }
 
 .logs-table th {
-    background: #2d2d2d;
     padding: 1rem;
     text-align: left;
-    font-weight: bold;
-    border-bottom: 1px solid #444;
-    color: #9cdcfe;
-    position: sticky;
-    top: 0;
+    font-weight: 600;
+    color: #333;
+    white-space: nowrap;
 }
 
-.logs-table td {
-    padding: 0.75rem 1rem;
-    border-bottom: 1px solid #333;
-    word-break: break-word;
+.logs-table tbody tr {
+    border-bottom: 1px solid #eee;
+    transition: background-color 0.2s ease;
+}
+
+.logs-table tbody tr:hover {
+    background-color: #f9f9f9;
 }
 
 .log-row {
-    transition: background 0.2s;
+    padding: 0.75rem;
 }
 
-.log-row:hover {
-    background: #252525;
+.log-row.action-promote:hover {
+    background-color: #f0f7ff;
+}
+
+.log-row.action-activate:hover {
+    background-color: #f0fff4;
+}
+
+.log-row.action-deactivate:hover {
+    background-color: #fff5f5;
+}
+
+.log-row.action-denied:hover {
+    background-color: #fef5e7;
 }
 
 .log-time {
-    color: #9cdcfe;
-    width: 200px;
-    flex-shrink: 0;
-}
-
-.log-level {
-    width: 80px;
-    flex-shrink: 0;
-}
-
-.level-badge {
-    display: inline-block;
-    padding: 0.25rem 0.5rem;
-    border-radius: 3px;
+    padding: 0.75rem 1rem;
+    color: #666;
     font-size: 0.85rem;
-    font-weight: bold;
+    font-family: 'Courier New', monospace;
+    white-space: nowrap;
 }
 
-.level-info {
-    background: #4ec9b0;
+.log-action {
+    padding: 0.75rem 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-weight: 600;
+}
+
+.action-icon {
+    font-size: 1.2rem;
+}
+
+.action-label {
+    color: #333;
+}
+
+.log-admin, .log-target {
+    padding: 0.75rem 1rem;
+}
+
+.log-admin strong, .log-target strong {
+    display: block;
+    color: #333;
+    margin-bottom: 0.25rem;
+}
+
+.log-admin small, .log-target small {
+    color: #999;
+    font-size: 0.8rem;
+}
+
+.log-details {
+    padding: 0.75rem 1rem;
+}
+
+.detail-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 0.5rem;
+    flex-wrap: wrap;
+}
+
+.detail-item strong {
+    color: #333;
+}
+
+.role-old, .role-new {
+    display: inline-block;
+    padding: 0.25rem 0.6rem;
+    border-radius: 4px;
+    font-size: 0.8rem;
+    font-weight: 600;
+}
+
+.role-old {
+    background-color: #fff3cd;
+    color: #856404;
+}
+
+.role-new {
+    background-color: #d4edda;
+    color: #155724;
+}
+
+.arrow {
+    color: #999;
+    margin: 0 0.25rem;
+}
+
+.status-active {
+    display: inline-block;
+    padding: 0.25rem 0.6rem;
+    background-color: #d4edda;
+    color: #155724;
+    border-radius: 4px;
+    font-size: 0.8rem;
+    font-weight: 600;
+}
+
+.status-inactive {
+    display: inline-block;
+    padding: 0.25rem 0.6rem;
+    background-color: #f8d7da;
+    color: #721c24;
+    border-radius: 4px;
+    font-size: 0.8rem;
+    font-weight: 600;
+}
+
+.description {
+    color: #666;
+    font-size: 0.85rem;
+    margin-top: 0.25rem;
+    font-style: italic;
+}
+
+.no-logs {
+    text-align: center;
+    padding: 3rem 1rem;
+    color: #999;
+    background-color: #f9f9f9;
+    border-radius: 6px;
+    border: 1px dashed #ddd;
+}
+
+.no-logs p {
+    margin: 0;
+    font-size: 1.1rem;
+}
+
+.pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 1rem;
+    margin-top: 1.5rem;
+    flex-wrap: wrap;
+}
+
+.page-link {
+    display: inline-block;
+    padding: 0.5rem 1rem;
+    background-color: #667eea;
     color: white;
+    text-decoration: none;
+    border-radius: 4px;
+    transition: background-color 0.3s ease;
+    font-size: 0.9rem;
 }
 
-.level-audit {
-    background: #45b7d1;
-    color: white;
+.page-link:hover {
+    background-color: #5568d3;
 }
 
-.level-warning {
-    background: #f39c12;
-    color: white;
-}
-
-.level-error {
-    background: #e74c3c;
-    color: white;
-}
-
-.log-message {
-    color: #ce9178;
-    flex: 1;
-}
-
-.audit-highlight {
-    color: #4ec9b0;
-    font-weight: bold;
-}
-
-.error-highlight {
-    color: #f48771;
-    font-weight: bold;
+.page-info {
+    padding: 0.5rem 1rem;
+    color: #666;
+    font-size: 0.9rem;
 }
 
 .logs-legend {
-    background: #f9f9f9;
-    padding: 2rem;
-    border-radius: 8px;
+    background-color: #f9f9f9;
+    padding: 1.5rem;
+    border-radius: 6px;
+    border: 1px solid #eee;
+    margin-top: 2rem;
 }
 
 .logs-legend h3 {
+    margin-top: 0;
     color: #333;
-    margin-bottom: 1rem;
+    font-size: 1.1rem;
+    margin-bottom: 1.5rem;
 }
 
 .legend-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
     gap: 1.5rem;
 }
 
 .legend-item {
     display: flex;
     gap: 1rem;
-    align-items: start;
+    padding: 1rem;
+    background-color: white;
+    border-radius: 4px;
+    border-left: 4px solid #ddd;
+}
+
+.legend-item.action-promote {
+    border-left-color: #007bff;
+}
+
+.legend-item.action-activate {
+    border-left-color: #28a745;
+}
+
+.legend-item.action-deactivate {
+    border-left-color: #dc3545;
+}
+
+.legend-item.action-denied {
+    border-left-color: #ffc107;
+}
+
+.legend-icon {
+    font-size: 1.5rem;
+    min-width: 2rem;
+    text-align: center;
 }
 
 .legend-item p {
+    margin: 0;
     color: #666;
     font-size: 0.9rem;
 }
 
-/* Scrollbar customizado */
-.logs-viewer::-webkit-scrollbar {
-    width: 8px;
+.legend-item p strong {
+    color: #333;
 }
 
-.logs-viewer::-webkit-scrollbar-track {
-    background: #2d2d2d;
-}
+@media (max-width: 768px) {
+    .audit-container {
+        padding: 1rem;
+    }
 
-.logs-viewer::-webkit-scrollbar-thumb {
-    background: #555;
-    border-radius: 4px;
-}
+    .audit-header h1 {
+        font-size: 1.5rem;
+    }
 
-.logs-viewer::-webkit-scrollbar-thumb:hover {
-    background: #777;
+    .logs-table {
+        font-size: 0.8rem;
+    }
+
+    .logs-table th,
+    .log-time,
+    .log-action,
+    .log-admin,
+    .log-target,
+    .log-details {
+        padding: 0.5rem;
+    }
+
+    .legend-grid {
+        grid-template-columns: 1fr;
+    }
 }
 </style>
 {% endblock %}

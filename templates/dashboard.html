@@ -23,6 +23,48 @@
             </div>
         </div>
     </div>
+
+    <!-- MENU DE GESTÃO - Apenas para Gestor e Administrador -->
+    {% if current_user.role in ['administrador', 'gestor'] %}
+    <div class="admin-panel">
+        <div class="admin-header">
+            <h2>⚙️ Painel de Gestão</h2>
+            <p class="admin-description">Ferramentas administrativas para gerenciar usuários, acessos e auditoria</p>
+        </div>
+        
+        <div class="admin-grid">
+            <!-- Card: Gerenciar Usuários -->
+            <a href="{{ url_for('admin.manage_users') }}" class="admin-card">
+                <div class="admin-icon">👥</div>
+                <div class="admin-content">
+                    <h3>Gerenciar Usuários</h3>
+                    <p>Visualizar, promover, rebaixar e desativar usuários</p>
+                </div>
+                <div class="admin-arrow">→</div>
+            </a>
+
+            <!-- Card: Logs de Auditoria -->
+            <a href="{{ url_for('admin.audit_logs') }}" class="admin-card">
+                <div class="admin-icon">📋</div>
+                <div class="admin-content">
+                    <h3>Logs de Auditoria</h3>
+                    <p>Histórico completo de liberações de acesso e alterações no sistema</p>
+                </div>
+                <div class="admin-arrow">→</div>
+            </a>
+
+            <!-- Card: Estatísticas -->
+            <a href="{{ url_for('admin.statistics') }}" class="admin-card">
+                <div class="admin-icon">📊</div>
+                <div class="admin-content">
+                    <h3>Estatísticas</h3>
+                    <p>Relatórios e gráficos de atividade do sistema</p>
+                </div>
+                <div class="admin-arrow">→</div>
+            </a>
+        </div>
+    </div>
+    {% endif %}
     
     <div class="permissions-info">
         <h2>Suas Permissões</h2>
@@ -56,7 +98,8 @@
                                 <td>{{ scan.target_hostname or '-' }}</td>
                                 <td>{{ scan.scan_type }}</td>
                                 <td><span class="status-badge status-{{ scan.status }}">{{ scan.status }}</span></td>
-                                <td>{{ scan.created_at.strftime('%d/%m/%Y %H:%M') }}</td>
+                                <td>{{ scan.created_at[:10] }}</td>
+
                                 <td>
                                     <a href="{{ url_for('scanner.view_scan', scan_id=scan.id) }}" class="action-link">Detalhes</a>
                                     {% if scan.status == 'completed' %}
@@ -98,4 +141,133 @@
         {% endif %}
     </div>
 </div>
+
+<style>
+.admin-panel {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-radius: 12px;
+    padding: 2rem;
+    margin: 2rem 0;
+    color: white;
+    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+}
+
+.admin-header {
+    margin-bottom: 2rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 2px solid rgba(255, 255, 255, 0.2);
+}
+
+.admin-header h2 {
+    margin: 0 0 0.5rem 0;
+    font-size: 1.8rem;
+    font-weight: 700;
+}
+
+.admin-description {
+    margin: 0;
+    font-size: 0.95rem;
+    opacity: 0.9;
+}
+
+.admin-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 1.5rem;
+}
+
+.admin-card {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    padding: 1.5rem;
+    background-color: rgba(255, 255, 255, 0.15);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 10px;
+    text-decoration: none;
+    color: white;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(10px);
+}
+
+.admin-card:hover {
+    background-color: rgba(255, 255, 255, 0.25);
+    border-color: rgba(255, 255, 255, 0.4);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+}
+
+.admin-card.admin-card-security {
+    background: linear-gradient(135deg, rgba(255, 193, 7, 0.2), rgba(255, 111, 0, 0.2));
+    border-color: rgba(255, 193, 7, 0.3);
+}
+
+.admin-card.admin-card-security:hover {
+    background: linear-gradient(135deg, rgba(255, 193, 7, 0.3), rgba(255, 111, 0, 0.3));
+    border-color: rgba(255, 193, 7, 0.5);
+}
+
+.admin-icon {
+    font-size: 2.5rem;
+    min-width: 3rem;
+    text-align: center;
+}
+
+.admin-content {
+    flex: 1;
+}
+
+.admin-content h3 {
+    margin: 0 0 0.25rem 0;
+    font-size: 1.1rem;
+    font-weight: 600;
+}
+
+.admin-content p {
+    margin: 0;
+    font-size: 0.9rem;
+    opacity: 0.85;
+}
+
+.admin-arrow {
+    font-size: 1.5rem;
+    transition: transform 0.3s ease;
+}
+
+.admin-card:hover .admin-arrow {
+    transform: translateX(4px);
+}
+
+@media (max-width: 768px) {
+    .admin-panel {
+        padding: 1.5rem;
+    }
+
+    .admin-header h2 {
+        font-size: 1.4rem;
+    }
+
+    .admin-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .admin-card {
+        gap: 1rem;
+        padding: 1.25rem;
+    }
+
+    .admin-icon {
+        font-size: 2rem;
+        min-width: 2.5rem;
+    }
+
+    .admin-content h3 {
+        font-size: 1rem;
+    }
+
+    .admin-content p {
+        font-size: 0.85rem;
+    }
+}
+</style>
 {% endblock %}
